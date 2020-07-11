@@ -34,8 +34,8 @@ def export_state_tuples(state_tuples, name):
 def import_state_tuples(state_tuples, name, num_replicas):
   restored = []
   for i in range(len(state_tuples) * num_replicas):
-    c = tf.get_collection_ref(name)[2 * i + 0]
-    h = tf.get_collection_ref(name)[2 * i + 1]
+    c = tf.compat.v1.get_collection_ref(name)[2 * i + 0]
+    h = tf.compat.v1.get_collection_ref(name)[2 * i + 1]
     restored.append(tf.contrib.rnn.LSTMStateTuple(c, h))
   return tuple(restored)
 

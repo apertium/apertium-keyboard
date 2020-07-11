@@ -117,7 +117,7 @@ class LMModel(object):
     if input_:
      input_data = input_.input_data
     else:
-     input_data = tf.placeholder(name="input_data", dtype=tf.int32, shape=(self.batch_size, self.num_steps))
+     input_data = tf.compat.v1.placeholder(name="input_data", dtype=tf.int32, shape=(self.batch_size, self.num_steps))
     self._input_data = input_data
 
     with tf.device("/cpu:0"):
@@ -128,10 +128,10 @@ class LMModel(object):
           for line in fin:
             tmp.append([float(e) for e in line.strip().split()])
         initializer = tf.convert_to_tensor(tmp, dtype=data_type())
-        embedding = tf.get_variable(
+        embedding = tf.compat.v1.get_variable(
             "embedding", [vocab_size, size], dtype=data_type(), initializer=initializer)
       else:
-        embedding = tf.get_variable(
+        embedding = tf.compat.v1.get_variable(
             "embedding", [vocab_size, size], dtype=data_type())
       inputs = tf.nn.embedding_lookup(embedding, input_data)
 
@@ -140,10 +140,10 @@ class LMModel(object):
 
     output, state = self._build_rnn_graph(inputs, config, is_training)
 
-    softmax_w = tf.get_variable(
+    softmax_w = tf.compat.v1.get_variable(
         "softmax_w", [size, vocab_size], dtype=data_type())
-    softmax_b = tf.get_variable("softmax_b", [vocab_size], dtype=data_type())
-    logits = tf.nn.xw_plus_b(output, softmax_w, softmax_b)
+    softmax_b = tf.compat.v1.get_variable("softmax_b", [vocab_size], dtype=data_type())
+    logits = tf.compat.v1.nn.xw_plus_b(output, softmax_w, softmax_b)
      # Reshape logits to be a 3-D tensor for sequence loss
     logits = tf.reshape(logits, [self.batch_size, self.num_steps, vocab_size])
     self._logits = logits
@@ -169,17 +169,17 @@ class LMModel(object):
       return
 
     self._lr = tf.Variable(0.0, trainable=False)
-    tvars = tf.trainable_variables()
+    tvars = tf.compat.v1.trainable_variables()
     grads, _ = tf.clip_by_global_norm(tf.gradients(self._cost, tvars),
                                       config.max_grad_norm)
-    optimizer = tf.train.GradientDescentOptimizer(self._lr)
+    optimizer = tf.compat.v1.train.GradientDescentOptimizer(self._lr)
     self._train_op = optimizer.apply_gradients(
         zip(grads, tvars),
-        global_step=tf.train.get_or_create_global_step())
+        global_step=tf.compat.v1.train.get_or_create_global_step())
 
-    self._new_lr = tf.placeholder(
+    self._new_lr = tf.compat.v1.placeholder(
         tf.float32, shape=[], name="new_learning_rate")
-    self._lr_update = tf.assign(self._lr, self._new_lr)
+    self._lr_update = tf.compat.v1.assign(self._lr, self._new_lr)
 
   def _build_rnn_graph(self, inputs, config, is_training):
     if config.rnn_mode == CUDNN:
@@ -196,7 +196,7 @@ class LMModel(object):
         input_size=config.hidden_size,
         dropout=1 - config.keep_prob if is_training else 0)
     params_size_t = self._cell.params_size()
-    self._rnn_params = tf.get_variable(
+    self._rnn_params = tf.compat.v1.get_variable(
         "lstm_params",
         initializer=tf.random_uniform(
             [params_size_t], -config.init_scale, config.init_scale),
@@ -253,9 +253,9 @@ class LMModel(object):
     # outputs, state = tf.nn.static_rnn(cell, inputs, initial_state=self._initial_state)
     # return outputs, state
     outputs = []
-    with tf.variable_scope("RNN"):
+    with tf.compat.v1.variable_scope("RNN"):
       for time_step in range(self.num_steps):
-        if time_step > 0: tf.get_variable_scope().reuse_variables()
+        if time_step > 0: tf.compat.v1.get_variable_scope().reuse_variables()
         (cell_output, state) = cell(inputs[:, time_step, :], state)
         outputs.append(cell_output)
     output = tf.reshape(tf.concat(outputs, 1), [-1, config.hidden_size])
@@ -285,11 +285,11 @@ class LMModel(object):
   def import_ops(self):
     """Imports ops from collections."""
     if self._is_training:
-      self._train_op = tf.get_collection_ref("train_op")[0]
-      self._lr = tf.get_collection_ref("lr")[0]
-      self._new_lr = tf.get_collection_ref("new_lr")[0]
-      self._lr_update = tf.get_collection_ref("lr_update")[0]
-      rnn_params = tf.get_collection_ref("rnn_params")
+      self._train_op = tf.compat.v1.get_collection_ref("train_op")[0]
+      self._lr = tf.compat.v1.get_collection_ref("lr")[0]
+      self._new_lr = tf.compat.v1.get_collection_ref("new_lr")[0]
+      self._lr_update = tf.compat.v1.get_collection_ref("lr_update")[0]
+      rnn_params = tf.compat.v1.get_collection_ref("rnn_params")
       if self._cell and rnn_params:
         params_saveable = tf.contrib.cudnn_rnn.RNNParamsSaveable(
             self._cell,
@@ -299,7 +299,7 @@ class LMModel(object):
             base_variable_scope="Model/RNN")
         tf.add_to_collection(tf.GraphKeys.SAVEABLE_OBJECTS, params_saveable)
     if not self._is_inference:
-      self._cost = tf.get_collection_ref(util.with_prefix(self._name, "cost"))[0]
+      self._cost = tf.compat.v1.get_collection_ref(util.with_prefix(self._name, "cost"))[0]
     num_replicas = FLAGS.num_gpus if self._name == "Train" else 1
     self._initial_state = util.import_state_tuples(
         self._initial_state, self._initial_state_name, num_replicas)
@@ -442,7 +442,7 @@ def run_epoch(session, model, eval_op=None, verbose=False):
     costs += cost
     iters += model.input.num_steps
 
-    if verbose and step % (model.input.epoch_size // 10) == 10:
+    if verbose: # and step % (model.input.epoch_size // 10) == 10:
       print("%.3f perplexity: %.3f speed: %.0f wps" %
             (step * 1.0 / model.input.epoch_size, np.exp(costs / iters),
              iters * model.input.batch_size * max(1, FLAGS.num_gpus) /
@@ -502,33 +502,33 @@ def main(_):
 
     with tf.name_scope("Train"):
       train_input = LMInput(config=config, data=train_data, name="TrainInput")
-      with tf.variable_scope("Model", reuse=None, initializer=initializer):
+      with tf.compat.v1.variable_scope("Model", reuse=None, initializer=initializer):
         m = LMModel(is_training=True, config=config, input_=train_input, is_inference=False)
-      tf.summary.scalar("Training Loss", m.cost)
-      tf.summary.scalar("Learning Rate", m.lr)
+      tf.compat.v1.summary.scalar("Training_Loss", m.cost)
+      tf.compat.v1.summary.scalar("Learning_Rate", m.lr)
 
     with tf.name_scope("Valid"):
       valid_input = LMInput(config=config, data=valid_data, name="ValidInput")
-      with tf.variable_scope("Model", reuse=True, initializer=initializer):
+      with tf.compat.v1.variable_scope("Model", reuse=True, initializer=initializer):
         mvalid = LMModel(is_training=False, config=config, input_=valid_input, is_inference=False)
-      tf.summary.scalar("Validation Loss", mvalid.cost)
+      tf.compat.v1.summary.scalar("Validation_Loss", mvalid.cost)
 
     with tf.name_scope("Test"):
       test_input = LMInput(
           config=eval_config, data=test_data, name="TestInput")
-      with tf.variable_scope("Model", reuse=True, initializer=initializer):
+      with tf.compat.v1.variable_scope("Model", reuse=True, initializer=initializer):
         mtest = LMModel(is_training=False, config=eval_config,
                          input_=test_input, is_inference=False)
 
     with tf.name_scope("Infer"):
-      with tf.variable_scope("Model", reuse=True, initializer=initializer):
+      with tf.compat.v1.variable_scope("Model", reuse=True, initializer=initializer):
         minfer = LMModel(is_training=False, config=infer_config,
                          input_=None, is_inference=True)
 
     models = {"Train": m, "Valid": mvalid, "Test": mtest, "Infer": minfer}
     for name, model in models.items():
       model.export_ops(name)
-    metagraph = tf.train.export_meta_graph()
+    metagraph = tf.compat.v1.train.export_meta_graph()
     if tf.__version__ < "1.1.0" and FLAGS.num_gpus > 1:
       raise ValueError("num_gpus > 1 is not supported for TensorFlow versions "
                        "below 1.1.0")
@@ -538,11 +538,12 @@ def main(_):
       util.auto_parallel(metagraph, m)
 
   with tf.Graph().as_default():
-    tf.train.import_meta_graph(metagraph)
+    tf.compat.v1.train.import_meta_graph(metagraph)
     for model in models.values():
       model.import_ops()
     sv = tf.train.Supervisor(logdir=FLAGS.save_path)
-    config_proto = tf.ConfigProto(allow_soft_placement=soft_placement)
+#    sv = tf.train.MonitoredTrainingSession()#logdir=FLAGS.save_path)
+    config_proto = tf.compat.v1.ConfigProto(allow_soft_placement=soft_placement)
     with sv.managed_session(config=config_proto) as session:
 
       #Export the current inference model to tflite.
@@ -580,4 +581,4 @@ def main(_):
 
 
 if __name__ == "__main__":
-  tf.app.run()
+  tf.compat.v1.app.run()

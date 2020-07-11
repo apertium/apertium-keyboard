@@ -23,6 +23,7 @@
           android:verticalGap="0px"
           android:keyHeight="@dimen/key_height"
 >
+<!--
     <Row>
         <Key android:codes="49" android:keyLabel="1" android:keyEdgeFlags="left"/>
         <Key android:codes="50" android:keyLabel="2"/>
@@ -35,9 +36,9 @@
         <Key android:codes="57" android:keyLabel="9"/>
         <Key android:codes="48" android:keyLabel="0" android:keyEdgeFlags="right"/>
     </Row>
-
+-->
     <Row>
-        <Key android:keyLabel="꞉" android:keyEdgeFlags="left"/>
+        <Key android:keyLabel="꞉" android:popupCharacters="q" android:popupKeyboard="@xml/popup" android:keyEdgeFlags="left"/>
         <Key android:codes="119" android:keyLabel="w"/>
         <Key android:codes="101" android:keyLabel="e"/>
         <Key android:codes="114" android:keyLabel="r"/>
