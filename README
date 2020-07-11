@@ -1,24 +1,42 @@
-# TFLMKeyboard
+# apertium-keyboard
 
-Currently supports a morpheme-aware character language model. Sample Guarani model (```converted_model.tflite```) lives in the assets directory, along with the set of symbols the LM is aware of (```labels.txt```), in order of their numerical index as used by the neural net.
+## Language model
 
-Currently, the keyboard uses a simplified prediction logic. It presents continuations of the current input, up to the next predicted boundary (morpheme, word, or sentence). In the keyboard view, word continuations are presented with a ```"_"``` at the end, morpheme continuations with a ```"@"```, and sentences with a ```"<eos>"```.
+Currently supports a morpheme-aware character language model. Sample Guarani model (```converted_model.tflite```) lives in the 
+assets directory (`./app/src/main/assets`), along with the set of symbols the LM is aware of (```labels.txt```), in order of 
+their numerical index as used by the neural net.
 
-This is achieved via a greedy unroll of the top 3 character predictions given the character history (i.e., running the language model with it's top choice given some starting point).
+Currently, the keyboard uses a simplified prediction logic. It presents continuations of the current input, up to the next 
+predicted boundary (morpheme, word, or sentence). In the keyboard view, word continuations are presented with a ```"_"``` 
+at the end, morpheme continuations with a ```"@"```, and sentences with a ```"<eos>"```.
 
-Note that when you load the keyboard from Android studio, you may need to activate it as an input method:
+This is achieved via a greedy unroll of the top 3 character predictions given the character history (i.e., running the language 
+model with it's top choice given some starting point).
 
-```Settings -> Languages & Input -> Virtual Keyboard -> Manage Keyboard```
+## Building
 
-TODO: Add additional logic for rewriting the current unit, rather than just completing it.
-
-## Building on the command line:
+### Building on the command line:
 
 ```
 $ gradle assembleDebug
 ```
 
 The `.apk` will be found in `./app/build/outputs/apk/debug/app-debug.apk`.
+
+Make sure you have the following environment variables set:
+```
+ANDROID_HOME=/path/to/android-sdk/
+NDK_HOME=/path/to/android-ndk-r19c
+JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+```
+
+### Building in android studio.
+
+Note that when you load the keyboard from Android studio, you may need to activate it as an input method:
+
+```Settings -> Languages & Input -> Virtual Keyboard -> Manage Keyboard```
+
+TODO: Add additional logic for rewriting the current unit, rather than just completing it.
 
 
 ## Key classes and methods:
