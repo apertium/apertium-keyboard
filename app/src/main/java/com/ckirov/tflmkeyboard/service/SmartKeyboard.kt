@@ -18,6 +18,8 @@ import com.ckirov.tflmkeyboard.tflite.LanguageModel.Device
 import com.ckirov.tflmkeyboard.R
 import kotlin.math.max
 
+import com.ckirov.tflmkeyboard.hfstol.HfstLanguageModel
+
 
 private const val N_PREDICTIONS = 3
 // TODO This should come from a config file representing the model
@@ -49,7 +51,8 @@ class SmartKeyboard : InputMethodService(), KeyboardView.OnKeyboardActionListene
 
     private lateinit var wordSeparators: Set<Char>
 
-    var languageModel: LanguageModel? = null
+    //var languageModel: LanguageModel? = null
+    var languageModel: HfstLanguageModel? = null
 
     /**
      * Main initialization of the input method component.  Be sure to call
@@ -59,7 +62,8 @@ class SmartKeyboard : InputMethodService(), KeyboardView.OnKeyboardActionListene
         super.onCreate()
         inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         wordSeparators = resources.getString(R.string.word_separators).toSet()
-        languageModel = LanguageModel.create(this, Model.FLOAT, Device.CPU, 4)
+//        languageModel = LanguageModel.create(this, Model.FLOAT, Device.CPU, 4)
+        languageModel = HfstLanguageModel()
     }
 
     /**
@@ -617,4 +621,30 @@ class SmartKeyboard : InputMethodService(), KeyboardView.OnKeyboardActionListene
         // We could use here the list of word separators
         return buffer.trimEnd().split(" ").takeLast(1)[0]
     }*/
+
+/*
+	FileInputStream transducerfile = null;
+	try
+	    { transducerfile = new FileInputStream(argv[0]); }
+	catch (java.io.FileNotFoundException e)
+	    {
+		System.err.println("File not found: couldn't read transducer file " + argv[0] + ".");
+		System.exit(1);
+	    }
+	System.out.println("Reading header...");
+        TransducerHeader h = null;
+        try { h = new TransducerHeader(transducerfile); }
+        catch (FormatException e) {
+            System.err.println("File must be in hfst optimized-lookup format");
+            System.exit(1);
+        }
+	DataInputStream charstream = new DataInputStream(transducerfile);
+	System.out.println("Reading alphabet...");
+	TransducerAlphabet a = new TransducerAlphabet(charstream, h.getSymbolCount());
+	System.out.println("Reading transition and index tables...");
+	if (h.isWeighted())
+	    {
+		Transducer transducer = new WeightedTransducer(transducerfile, h, a);
+		runTransducer(transducer);
+*/
 }

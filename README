@@ -57,3 +57,6 @@ TODO: Add additional logic for rewriting the current unit, rather than just comp
 ```SmartKeyboard::handleBackspace() //What should happen if the user made a mistake and backs up?```
 
 
+## Acknowledgements 
+
+The original fork this code is based on was written by Christo Kirov.
