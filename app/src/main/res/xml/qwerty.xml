@@ -37,7 +37,8 @@
     </Row>
 
     <Row>
-        <Key android:codes="\\uA789" android:keyLabel="꞉" android:keyEdgeFlags="left"/>
+        <!--<Key android:codes="\\uA789" android:keyLabel="꞉" android:keyEdgeFlags="left"/>-->
+        <Key android:keyLabel="꞉" android:keyEdgeFlags="left"/>
         <Key android:codes="119" android:keyLabel="w"/>
         <Key android:codes="101" android:keyLabel="e"/>
         <Key android:codes="114" android:keyLabel="r"/>
@@ -59,7 +60,8 @@
         <Key android:codes="106" android:keyLabel="j"/>
         <Key android:codes="107" android:keyLabel="k"/>
         <Key android:codes="108" android:keyLabel="l"/>
-        <Key android:codes="\\u02BC" android:keyLabel="ʼ" android:keyEdgeFlags="right"/>
+        <!--<Key android:codes="\\u02BC" android:keyLabel="ʼ" android:keyEdgeFlags="right"/>-->
+        <Key android:keyLabel="ʼ" android:keyEdgeFlags="right"/>
     </Row>
 
     <Row>
