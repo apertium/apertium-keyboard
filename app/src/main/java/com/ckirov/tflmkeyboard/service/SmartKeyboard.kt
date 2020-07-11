@@ -141,7 +141,7 @@ class SmartKeyboard : InputMethodService(), KeyboardView.OnKeyboardActionListene
                 // be doing predictive text (showing candidates as the
                 // user types).
 
-                predictionOn = true
+                predictionOn = true // turning this off breaks input.
 
                 // We now look for a few special variations of text that will
                 // modify our behavior.
@@ -441,8 +441,11 @@ class SmartKeyboard : InputMethodService(), KeyboardView.OnKeyboardActionListene
     private fun updateCandidates() {
         history = currentInputConnection.getTextBeforeCursor(30, 0) ?: ""
         Log.d("IME", history.toString())
-        val list = getPredictions(history.toString()).toList()
-        setSuggestions(list)
+// FMT: 11-07
+//        val list = getPredictions(history.toString()).toList()
+//        setSuggestions(list)
+
+
 //        if (!completionOn) {
 //            if (composing.isNotEmpty()) {
 //                val list = getPredictions(composing.toString()).toList()

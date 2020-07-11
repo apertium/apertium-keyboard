@@ -38,6 +38,9 @@ Note that when you load the keyboard from Android studio, you may need to activa
 
 TODO: Add additional logic for rewriting the current unit, rather than just completing it.
 
+## Files
+
+* `./app/src/main/res/xml/qwerty.xml`: This is the main keyboard layout file
 
 ## Key classes and methods:
 
