@@ -1,0 +1,8 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: apertium-keyboard
+Description: System for building mobile keyboards using Apertium language data
+Version: @VERSION@

@@ -51,8 +51,8 @@ class SmartKeyboard : InputMethodService(), KeyboardView.OnKeyboardActionListene
 
     private lateinit var wordSeparators: Set<Char>
 
-    //var languageModel: LanguageModel? = null
-    var languageModel: HfstLanguageModel? = null
+    var languageModel: LanguageModel? = null
+//    var languageModel: HfstLanguageModel? = null
 
     /**
      * Main initialization of the input method component.  Be sure to call
@@ -63,7 +63,7 @@ class SmartKeyboard : InputMethodService(), KeyboardView.OnKeyboardActionListene
         inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         wordSeparators = resources.getString(R.string.word_separators).toSet()
 //        languageModel = LanguageModel.create(this, Model.FLOAT, Device.CPU, 4)
-        languageModel = HfstLanguageModel()
+//        languageModel = HfstLanguageModel()
     }
 
     /**
