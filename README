@@ -42,6 +42,10 @@ TODO: Add additional logic for rewriting the current unit, rather than just comp
 
 * `./app/src/main/res/xml/qwerty.xml`: This is the main keyboard layout file
 
+* `./src/main/assets`
+* `./src/main/java`
+* `./src/main/res`
+
 ## Key classes and methods:
 
 ```LanguageModel/LanguageModelMobileNet```: These classes in the ```tflite``` directory store the code for loading a Tensorflow Lite model, and using it to generate keyboard predictions. See ```LanguageModel::generate()``` for the inference function.

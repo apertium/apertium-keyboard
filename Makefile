@@ -7,3 +7,4 @@ apk:
 
 clean:
 	gradle clean
+	rm -rf app/build
