@@ -13,7 +13,7 @@ Then open up your Settings.
 
 Go to 'System' → 'Language and text entry' → 'Virtual keyboard' and click on `+ Manage keyboards'
 
-Turn on `TFLMKeyboard`.
+Turn on `Apertium Keyboard`.
 
 ## Switching keyboards
 
@@ -21,5 +21,5 @@ Now open up some app with text entry
 
 Click on the text entry box and hold and click on the globe icon, or on the little keyboard icon. 
 
-Choose `TFLMKeyboard`.
+Choose `Apertium Keyboard`.
 
