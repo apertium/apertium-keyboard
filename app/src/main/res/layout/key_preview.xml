@@ -1,7 +1,10 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
           android:layout_width="match_parent" android:layout_height="match_parent"
-          android:background="@color/colorPrimary"
-          android:textColor="@color/colorPrimaryDark"
           android:textAlignment="center"
+          android:theme="@style/AppTheme"
           android:textSize="30sp">
 </TextView>
+<!--
+          android:background="@color/colorPrimary"
+          android:textColor="@color/colorPrimaryDark"
+-->

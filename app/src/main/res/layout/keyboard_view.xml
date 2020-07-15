@@ -4,5 +4,7 @@
                                          android:layout_height="match_parent"
                                          android:id="@+id/keyboard_view"
                                          android:keyPreviewLayout="@layout/key_preview"
-                                         android:layout_alignParentBottom="true">
+                                         android:layout_alignParentBottom="true"
+					 android:background="#ffffff"   
+                                         android:theme="@style/AppTheme">
 </android.inputmethodservice.KeyboardView>
