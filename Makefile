@@ -8,3 +8,4 @@ apk:
 clean:
 	gradle clean
 	rm -rf app/build
+	rm -rf .gradle

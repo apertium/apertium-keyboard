@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ckirov.tflmkeyboard.service
+package org.apertium.keyboard.service
 
 import android.content.Context
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.ckirov.tflmkeyboard.R
+import org.apertium.keyboard.R
 import kotlinx.android.synthetic.main.layout_candidate.view.*
 
 /**

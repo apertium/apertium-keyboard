@@ -7,7 +7,7 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.ckirov.tflmkeyboard"
+        applicationId "org.apertium.keyboard"
         minSdkVersion 23
         targetSdkVersion 28
         versionCode 1

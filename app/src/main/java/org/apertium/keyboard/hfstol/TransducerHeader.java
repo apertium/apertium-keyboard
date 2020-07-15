@@ -1,8 +1,8 @@
-package com.ckirov.tflmkeyboard.hfstol;
+package org.apertium.keyboard.hfstol;
 
 //import java.io.DataInputStream;
 import java.io.FileInputStream;
-import com.ckirov.tflmkeyboard.hfstol.FormatException;
+import org.apertium.keyboard.hfstol.FormatException;
 
 /**
  * On instantiation reads the transducer's header and provides an interface

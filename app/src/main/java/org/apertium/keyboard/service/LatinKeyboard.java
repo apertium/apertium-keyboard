@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ckirov.tflmkeyboard.service;
+package org.apertium.keyboard.service;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -21,7 +21,7 @@ import android.content.res.XmlResourceParser;
 import android.graphics.drawable.Drawable;
 import android.inputmethodservice.Keyboard;
 import android.view.inputmethod.EditorInfo;
-import com.ckirov.tflmkeyboard.R;
+import org.apertium.keyboard.R;
 
 public class LatinKeyboard extends Keyboard {
     private Key mEnterKey;

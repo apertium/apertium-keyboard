@@ -1,7 +1,7 @@
-package com.ckirov.tflmkeyboard
+package org.apertium.keyboard
 
 import android.app.Application
-//import com.ckirov.tflmkeyboard.di.predictModule
+//import org.apertium.keyboard.di.predictModule
 //import org.koin.android.ext.android.startKoin
 
 class SmartKeyboardApp : Application() {

@@ -1,4 +1,4 @@
-package com.ckirov.tflmkeyboard.hfstol;
+package org.apertium.keyboard.hfstol;
 
 import java.io.FileInputStream;
 import java.io.DataInputStream;
@@ -7,11 +7,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Collection;
 
-import com.ckirov.tflmkeyboard.hfstol.Transducer;
-import com.ckirov.tflmkeyboard.hfstol.UnweightedTransducer;
-import com.ckirov.tflmkeyboard.hfstol.WeightedTransducer;
-import com.ckirov.tflmkeyboard.hfstol.NoTokenizationException;
-import com.ckirov.tflmkeyboard.hfstol.FormatException;
+import org.apertium.keyboard.hfstol.Transducer;
+import org.apertium.keyboard.hfstol.UnweightedTransducer;
+import org.apertium.keyboard.hfstol.WeightedTransducer;
+import org.apertium.keyboard.hfstol.NoTokenizationException;
+import org.apertium.keyboard.hfstol.FormatException;
 
 /**
  * HfstRuntimeReader takes a transducer (the name of which should

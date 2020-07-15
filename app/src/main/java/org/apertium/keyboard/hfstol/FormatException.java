@@ -1,4 +1,4 @@
-package com.ckirov.tflmkeyboard.hfstol;
+package org.apertium.keyboard.hfstol;
 
 public class FormatException extends Exception {
     //    public FormatException(String str)

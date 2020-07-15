@@ -1,4 +1,4 @@
-package com.ckirov.tflmkeyboard.service
+package org.apertium.keyboard.service
 
 import android.content.Context
 import android.inputmethodservice.InputMethodService
@@ -12,13 +12,13 @@ import android.view.KeyCharacterMap
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.*
-import com.ckirov.tflmkeyboard.tflite.LanguageModel
-import com.ckirov.tflmkeyboard.tflite.LanguageModel.Model
-import com.ckirov.tflmkeyboard.tflite.LanguageModel.Device
-import com.ckirov.tflmkeyboard.R
+import org.apertium.keyboard.tflite.LanguageModel
+import org.apertium.keyboard.tflite.LanguageModel.Model
+import org.apertium.keyboard.tflite.LanguageModel.Device
+import org.apertium.keyboard.R
 import kotlin.math.max
 
-import com.ckirov.tflmkeyboard.hfstol.HfstLanguageModel
+import org.apertium.keyboard.hfstol.HfstLanguageModel
 
 
 private const val N_PREDICTIONS = 3

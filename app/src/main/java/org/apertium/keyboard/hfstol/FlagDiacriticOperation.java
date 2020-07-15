@@ -1,4 +1,4 @@
-package com.ckirov.tflmkeyboard.hfstol;
+package org.apertium.keyboard.hfstol;
 
 /**
  * A representation of one flag diacritic statement

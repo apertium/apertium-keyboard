@@ -1,18 +1,19 @@
-package com.ckirov.tflmkeyboard.hfstol;
+package org.apertium.keyboard.hfstol;
 
+import java.io.DataInputStream;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 
-import com.ckirov.tflmkeyboard.hfstol.Transducer;
-import com.ckirov.tflmkeyboard.hfstol.NoTokenizationException;
+import org.apertium.keyboard.hfstol.Transducer;
+import org.apertium.keyboard.hfstol.NoTokenizationException;
 
 /**
  * Reads the header, alphabet, index table and transition table and provides
  * interfaces to them.
  */
-public class UnweightedTransducer extends Transducer
+public class WeightedTransducer extends Transducer
 {
 
     public class TransitionIndex
@@ -40,6 +41,9 @@ public class UnweightedTransducer extends Transducer
 	    return (inputSymbol == HfstOptimizedLookup.NO_SYMBOL_NUMBER &&
 		    firstTransitionIndex != HfstOptimizedLookup.NO_TABLE_INDEX);
 	}
+
+	public float getFinalWeight()
+	{ return Float.intBitsToFloat((int)firstTransitionIndex); }
 	
 	    public long target()
 	{ return firstTransitionIndex; }
@@ -47,8 +51,9 @@ public class UnweightedTransducer extends Transducer
 	public int getInput()
 	{ return inputSymbol; }
     }
-
-
+    
+    
+    
     /**
      * On instantiation reads the transducer's index table and provides an interface
      * to it.
@@ -80,18 +85,28 @@ public class UnweightedTransducer extends Transducer
 	{ return indices[index]; }
 
     }
-
+    
     public class Transition
     {
 	protected int inputSymbol;
 	protected int outputSymbol;
 	protected long targetIndex;
+	protected float weight;
 	
-	public Transition(int input, int output, long target)
+	public Transition(int input, int output, long target, float w)
 	{
 	    inputSymbol = input;
 	    outputSymbol = output;
 	    targetIndex = target;
+	    weight = w;
+	}
+
+	public Transition()
+	{
+	    inputSymbol = HfstOptimizedLookup.NO_SYMBOL_NUMBER;
+	    outputSymbol = HfstOptimizedLookup.NO_SYMBOL_NUMBER;
+	    targetIndex = Long.MAX_VALUE;
+	    weight = HfstOptimizedLookup.INFINITE_WEIGHT;
 	}
 	
 	public Boolean matches(int symbol)
@@ -117,27 +132,31 @@ public class UnweightedTransducer extends Transducer
 		    outputSymbol == HfstOptimizedLookup.NO_SYMBOL_NUMBER &&
 		    targetIndex == 1);
 	}
+
+	public float getWeight()
+	{ return weight; }
     }
     
     /**
      * On instantiation reads the transducer's transition table and provides an
      * interface to it.
      */
-        public class TransitionTable
+    public class TransitionTable
     {
 	private Transition[] transitions;
 
 	public TransitionTable(FileInputStream filestream,
 			       Integer transitionCount) throws java.io.IOException
 	{
-	    ByteArray b = new ByteArray((int) transitionCount*8);
-	    // each transition entry is two unsigned shorts and an unsigned int
+	    ByteArray b = new ByteArray((int) transitionCount*12);
+	    // 12 bytes per transition
+	    // each transition entry is two unsigned shorts, an unsigned int and a float
 	    filestream.read(b.getBytes());
 	    transitions = new Transition[transitionCount];
 	    Integer i = 0;
 	    while (i < transitionCount)
 		{
-		    transitions[i] = new Transition(b.getUShort(), b.getUShort(), b.getUInt());
+		    transitions[i] = new Transition(b.getUShort(), b.getUShort(), b.getUInt(), b.getFloat());
 		    i++;
 		}
 	}
@@ -152,7 +171,7 @@ public class UnweightedTransducer extends Transducer
 
     protected TransducerHeader header;
     protected TransducerAlphabet alphabet;
-    protected Stack< int[] > stateStack;
+    protected Stack<int[]> stateStack;
     protected Hashtable<Integer, FlagDiacriticOperation> operations;
     protected LetterTrie letterTrie;
     protected IndexTable indexTable;
@@ -162,12 +181,13 @@ public class UnweightedTransducer extends Transducer
     protected Vector<Integer> inputString;
     protected int outputPointer;
     protected int inputPointer;
+    protected float current_weight;
     
-    public UnweightedTransducer(FileInputStream file, TransducerHeader h, TransducerAlphabet a) throws java.io.IOException
+    public WeightedTransducer(FileInputStream file, TransducerHeader h, TransducerAlphabet a) throws java.io.IOException
     {
 	header = h;
 	alphabet = a;
-	stateStack = new Stack<int[]>();
+	stateStack = new Stack< int[] >();
 	int[] neutral = new int[alphabet.features];
 	for (int i = 0; i < neutral.length; ++i) {
 	    neutral[i] = 0;
@@ -190,9 +210,10 @@ public class UnweightedTransducer extends Transducer
 	inputString = new Vector<Integer>();
 	outputPointer = 0;
 	inputPointer = 0;
+	current_weight = 0.0f;
     }
 
-        private int pivot(long i)
+    private int pivot(long i)
     {
 	if (i >= HfstOptimizedLookup.TRANSITION_TARGET_TABLE_START) {
 	    return (int) (i - HfstOptimizedLookup.TRANSITION_TARGET_TABLE_START);
@@ -221,7 +242,9 @@ public class UnweightedTransducer extends Transducer
 			} else {
 			outputString[outputPointer] = transitionTable.at(index).getOutput();
 			++outputPointer;
+			current_weight += transitionTable.at(index).getWeight();
 			getAnalyses(transitionTable.at(index).target());
+			current_weight -= transitionTable.at(index).getWeight();
 			--outputPointer;
 			++index;
 			stateStack.pop();
@@ -231,7 +254,9 @@ public class UnweightedTransducer extends Transducer
 		    { // epsilon transitions
 			outputString[outputPointer] = transitionTable.at(index).getOutput();
 			++outputPointer;
+			current_weight += transitionTable.at(index).getWeight();
 			getAnalyses(transitionTable.at(index).target());
+			current_weight -= transitionTable.at(index).getWeight();
 			--outputPointer;
 			++index;
 			continue;
@@ -247,7 +272,7 @@ public class UnweightedTransducer extends Transducer
     {
 	if (indexTable.at(index + (inputString.get(inputPointer - 1))).getInput() == inputString.get(inputPointer - 1))
 	    {
-		findTransitions(pivot(indexTable.at(index + (inputString.get(inputPointer - 1))).target()));
+		findTransitions(pivot(indexTable.at(index + inputString.get(inputPointer - 1)).target()));
 	    }
     }
 
@@ -259,7 +284,9 @@ public class UnweightedTransducer extends Transducer
 		    {
 			outputString[outputPointer] = transitionTable.at(index).getOutput();
 			++outputPointer;
+			current_weight += transitionTable.at(index).getWeight();
 			getAnalyses(transitionTable.at(index).target());
+			current_weight -= transitionTable.at(index).getWeight();
 			--outputPointer;
 		    } else
 		    {
@@ -274,12 +301,18 @@ public class UnweightedTransducer extends Transducer
 	if (idx >= HfstOptimizedLookup.TRANSITION_TARGET_TABLE_START)
 	    {
 		int index = pivot(idx);
-		tryEpsilonTransitions(index + 1);
+		tryEpsilonTransitions(pivot(index) + 1);
 		if (inputString.get(inputPointer) == HfstOptimizedLookup.NO_SYMBOL_NUMBER)
 		    { // end of input string
 			outputString[outputPointer] = HfstOptimizedLookup.NO_SYMBOL_NUMBER;
+			if (transitionTable.size() <= index)
+			    { return; }
 			if (transitionTable.at(index).isFinal())
-			    { noteAnalysis(); }
+			    {
+				current_weight += transitionTable.at(index).getWeight();
+				noteAnalysis();
+				current_weight -= transitionTable.at(index).getWeight();
+			    }
 			return;
 		    }
 		++inputPointer;
@@ -292,7 +325,11 @@ public class UnweightedTransducer extends Transducer
 		    { // end of input string
 			outputString[outputPointer] = HfstOptimizedLookup.NO_SYMBOL_NUMBER;
 			if (indexTable.isFinal(index))
-			    { noteAnalysis(); }
+			    {
+				current_weight += indexTable.at(index).getFinalWeight();
+				noteAnalysis();
+				current_weight -= indexTable.at(index).getFinalWeight();
+			    }
 			return;
 		    }
 		++inputPointer;
@@ -311,9 +348,11 @@ public class UnweightedTransducer extends Transducer
 		displayVector.set(displayVector.size() - 1, displayVector.lastElement() + alphabet.keyTable.get(outputString[i]));
 		++i;
 	    }
+	displayVector.set(displayVector.size() - 1, displayVector.lastElement() + "\t" + current_weight);
     }
 
-    public Collection<String> analyze(String input) throws NoTokenizationException
+    public Collection<String> analyze(String input)
+	throws NoTokenizationException
     {
 	inputString.clear();
 	displayVector.clear();
@@ -338,7 +377,7 @@ public class UnweightedTransducer extends Transducer
 	return new ArrayList<String>(displayVector);
     }
 
-    private Boolean pushState(FlagDiacriticOperation flag)
+        private Boolean pushState(FlagDiacriticOperation flag)
     {
 	int[] top = new int[alphabet.features];
 	System.arraycopy(stateStack.peek(), 0, top, 0, alphabet.features);
@@ -365,7 +404,7 @@ public class UnweightedTransducer extends Transducer
 		}
 	    else {
 		if (stateStack.peek()[flag.feature] == flag.value) {
-		    stateStack.push(stateStack.peek());
+		    stateStack.push(top);
 		    return true;
 		}
 	    }
@@ -408,5 +447,4 @@ public class UnweightedTransducer extends Transducer
 	}
 	return false; // compiler sanity
     }
-
 }

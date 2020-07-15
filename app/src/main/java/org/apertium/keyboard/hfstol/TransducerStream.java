@@ -1,4 +1,4 @@
-package com.ckirov.tflmkeyboard.hfstol;
+package org.apertium.keyboard.hfstol;
 
 import java.io.DataInputStream;
 

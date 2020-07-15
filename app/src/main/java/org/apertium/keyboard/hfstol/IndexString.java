@@ -1,4 +1,4 @@
-package com.ckirov.tflmkeyboard.hfstol;
+package org.apertium.keyboard.hfstol;
 
 // There has to be a better way...
 public class IndexString
